@@ -29,20 +29,29 @@ eda_task = Task(
 
 cleaning_task = Task(
     description='''
-    You have been provided with an EDA report from the Data Analyst agent.
-    
-    Based on their findings, write a complete, runnable Python script that:
-    - Drops all columns identified as redundant, identifying, or leakage risks
-    - Engineers any features the analyst recommended
-    - Handles class imbalance using the suggested approach
-    - Encodes and scales features appropriately for logistic regression
-    - Prints dataset shape and class balance before and after cleaning
-    - Saves the result to data/cleaned_fraud.csv
+    Based on the EDA report from the previous task, write a complete Python script to clean fraudTrain.csv.
 
-    Use the EDA report as your primary source of truth. 
-    Output only the Python script with inline comments. No explanations.
+    The script must:
+    - Drop all columns identified as redundant, identifying, or leakage risks
+    - Engineer features from datetime and coordinate columns as recommended
+    - Handle class imbalance using class weighting (NOT SMOTE) — compute and save weights for the model training agent
+    - Keep the cleaned dataset human readable: no scaling, preserve original value formats where possible
+    - Print dataset shape and class balance before and after
+    - Save cleaned data to cleaned_fraud.csv
+    - Save class weights to class_weights.json
+    - Use sklearn's compute_class_weight with keyword arguments: 
+        class_weight='balanced', 
+        classes=np.unique(y), 
+        y=y
+    )
+    - When saving class weights to JSON, convert numpy types first: 
+    {int(k): float(v) for k, v in class_weights_dict.items()}
+
+
+    Use the EDA report as your primary source of truth.
+    Output only the complete runnable Python script with inline comments. No explanations.
     ''',
-    expected_output='A complete runnable Python script based on the EDA findings.',
+    expected_output='A complete runnable Python script that produces a human-readable cleaned_fraud.csv and class_weights.json',
     agent=cleaning_agent,
     context=[eda_task]
 )
