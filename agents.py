@@ -20,3 +20,13 @@ cleaning_agent = Agent(
     allow_delegation = False,
     llm = llm
 )
+
+stats_agent = Agent(
+    role="Statistical Analyst",
+    goal="Validate the cleaned dataset and identify the most statistically significant features for logistic regression",
+    backstory="You are a statistician specialising in feature selection and validation for binary classification problems. You use statistical tests to identify which features are truly predictive and flag any issues like multicollinearity that could harm logistic regression performance.",
+    verbose=True,
+    allow_delegation=False,
+    llm=llm
+
+)
