@@ -3,4 +3,5 @@ fraudTest.csv
 fraudTrain.csv
 /fraudData
 /data
-/__pycache__
+/__pycache__.env
+.env

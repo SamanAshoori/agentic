@@ -42,6 +42,9 @@ cleaning_task = Task(
     - Handle class imbalance with class weighting (NOT SMOTE)
     - Save cleaned data to data/cleaned_fraud.csv
     - Save class weights to data/class_weights.json
+    - Load data from data/fraudTrain.csv (exact filename, no variations)
+    - compute_class_weight requires classes as numpy array:
+    classes=np.array([0, 1]) not a plain list
 
     Output only the complete runnable Python script. No explanations.
     ''',
