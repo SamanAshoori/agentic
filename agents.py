@@ -64,3 +64,15 @@ eval_agent = Agent(
     allow_delegation=False,
     llm=llm
 )
+
+report_agent = Agent(
+    role="Data Storyteller",
+    goal="Create a professional PowerPoint presentation summarising the fraud detection ML pipeline and results",
+    backstory="""You are a data storyteller who creates compelling, visually professional presentations for business audiences.
+    You write clean pptxgenjs JavaScript code to produce boardroom-ready decks.
+    You know that great slides use large stat callouts, minimal text, strong colour contrast, and varied layouts.
+    You never use accent lines under titles. You never use #prefix on hex colours. You never reuse option objects across calls.""",
+    verbose=True,
+    allow_delegation=False,
+    llm=llm
+)

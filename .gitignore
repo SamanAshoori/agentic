@@ -1,7 +1,30 @@
-fraudData.zip
-fraudTest.csv
-fraudTrain.csv
-/fraudData
-/data
-/__pycache__.env
+# Data files
+data/*.csv
+data/*.json
+data/*.pkl
+
+# Generated code
+*_generated_code.py
+*_generated_code.js
+
+# Node
+node_modules/
+package-lock.json
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Environment
 .env
+venv/
+
+# IDE
+.vscode/
+.idea/

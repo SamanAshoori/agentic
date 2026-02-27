@@ -1,0 +1,23 @@
+{
+  "name": "agentic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "report_generated_code.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamanAshoori/agentic.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamanAshoori/agentic/issues"
+  },
+  "homepage": "https://github.com/SamanAshoori/agentic#readme",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}
