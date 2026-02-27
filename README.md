@@ -76,7 +76,7 @@ agentic/
 
 **1. Clone and install dependencies:**
 ```bash
-git clone https://github.com/SamanAshoori/agentic.git
+git clone https://github.com/SamanAshoori/Machine_Learning_Agentic_Workflow.git
 cd agentic
 python3 -m venv venv
 source venv/bin/activate
