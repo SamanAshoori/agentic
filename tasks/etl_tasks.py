@@ -22,28 +22,28 @@ eda_task = Task(
     - List of columns that may cause data leakage, or are identifying/redundant
     - A concise plan for the data cleaning agent
     ''',
-    expected_output='A clear markdown report with: target variable, class imbalance analysis, leakage columns, and cleaning plan.',
+    expected_output='''A markdown report with these exact sections:
+    ## Target Variable
+    ## Class Imbalance
+    ## Columns To Drop (list every column to remove with one line reason each)
+    ## Feature Engineering Steps (numbered, specific)
+    ## Cleaning Plan (numbered steps for the cleaning agent to follow exactly)
+    ''',
     agent=eda_agent
 )
 
 cleaning_task = Task(
     description='''
-    Based on the EDA report from the previous task, write a complete Python script to clean data/fraudTrain.csv.
+    You will receive an EDA report. Follow it exactly.
 
-    The script must:
-    - Drop all columns identified as redundant, identifying, or leakage risks
-    - Engineer features from datetime and coordinate columns as recommended
-    - Handle class imbalance using class weighting (NOT SMOTE):
-      compute_class_weight(class_weight='balanced', classes=np.unique(y), y=y)
-    - When saving class weights to JSON, convert numpy types:
-      {int(k): float(v) for k, v in class_weights_dict.items()}
-    - Keep the dataset human readable: no scaling, preserve original value formats
-    - Print dataset shape and class balance before and after
+    - Drop every column listed under "Columns To Drop" — no exceptions
+    - Follow every step listed under "Feature Engineering Steps" in order
+    - Follow every step listed under "Cleaning Plan" in order
+    - Handle class imbalance with class weighting (NOT SMOTE)
     - Save cleaned data to data/cleaned_fraud.csv
     - Save class weights to data/class_weights.json
 
-    Use the EDA report as your primary source of truth.
-    Output only the complete runnable Python script with inline comments. No explanations.
+    Output only the complete runnable Python script. No explanations.
     ''',
     expected_output='A complete runnable Python script that produces data/cleaned_fraud.csv and data/class_weights.json',
     agent=cleaning_agent,

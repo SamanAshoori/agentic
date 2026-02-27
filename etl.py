@@ -3,7 +3,7 @@ from crewai import Crew
 from agents import eda_agent, cleaning_agent
 from tasks.etl_tasks import eda_task, cleaning_task
 
-def extract_and_save_code(text, filename="agent_generated_code.py"):
+def extract_and_save_code(text, filename="etl_generated_code.py"):
     match = re.search(r'```python(.*?)```', text, re.DOTALL)
     if match:
         code = match.group(1).strip()
