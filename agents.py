@@ -39,13 +39,27 @@ stats_agent = Agent(
 
 model_agent = Agent(
     role="Machine Learning Engineer",
-    goal="Train a logistic regression model for fraud detection using the selected features and class weights",
+    goal="Train a Random Forest model for fraud detection using the selected features and class weights",
     backstory="""You are a machine learning engineer specialising in binary classification problems.
-    You write clean, production quality sklearn code. You know that for imbalanced fraud detection:
-    - Class weights must be applied to penalise missed fraud cases
-    - The model must be saved for use by the evaluation agent
-    - Precision, recall and F1 must be reported on a validation split
-    - Recall is the most important metric — missing fraud is worse than a false alarm""",
+    You write clean, production quality sklearn code. You know that for fraud detection:
+    - Random Forest handles class imbalance natively via class_weight parameter
+    - No feature scaling needed for tree based models
+    - The model and feature list must be saved for the evaluation agent
+    - Recall is the most important metric — missing fraud is worse than a false alarm
+    - n_estimators=100 and max_depth=10 are good starting points for large datasets""",
+    verbose=True,
+    allow_delegation=False,
+    llm=llm
+)
+eval_agent = Agent(
+    role="Model Evaluator",
+    goal="Evaluate the trained fraud detection model on unseen test data and produce a comprehensive performance report",
+    backstory="""You are a model evaluation specialist who rigorously tests ML models on held-out data.
+    You know that for fraud detection:
+    - Recall is the primary metric — missing fraud is catastrophic
+    - Precision matters too — too many false alarms erode trust
+    - Threshold tuning beyond 0.5 can significantly improve the precision/recall tradeoff
+    - Results must be saved clearly for the reporting agent to use""",
     verbose=True,
     allow_delegation=False,
     llm=llm
