@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>ML Pipeline Report</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a1a2e; background: #f5f7fa; }
+    .page { max-width: 960px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+    .report-header { background: #1e3a5f; color: white; padding: 1.5rem 2rem; border-radius: 8px; margin-bottom: 1.5rem; }
+    .report-header h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .report-header .meta { font-size: 0.8rem; opacity: 0.75; }
+    .section { background: white; border: 1px solid #dde3ee; border-radius: 6px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+    .section h2 { font-size: 0.95rem; font-weight: 700; color: #1e3a5f; border-bottom: 2px solid #1e3a5f; padding-bottom: 0.4rem; margin-bottom: 0.9rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #eef2f9; color: #334155; font-weight: 600; padding: 0.45rem 0.6rem; text-align: left; border-bottom: 1px solid #c8d4e8; font-size: 11px; }
+    td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #eef0f4; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8faff; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'Consolas', monospace; }
+    .sig { font-weight: 600; }
+    .total-row td { background: #f0f4fb; }
+    .footnote { font-size: 11px; color: #64748b; margin-top: 0.5rem; }
+    .badge-keep { color: #15803d; font-weight: 600; }
+    .badge-drop { color: #b91c1c; font-weight: 600; }
+    .bar { height: 12px; background: #3b82f6; border-radius: 2px; }
+    p { margin-bottom: 0.5rem; font-size: 13px; }
+    @media print {
+      body { background: white; }
+      .page { padding: 0; }
+      .section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="report-header">
+    <h1>ML Pipeline Report</h1>
+    <div class="meta">Target: is_fraud &nbsp;|&nbsp; Model: LogisticRegression &nbsp;|&nbsp; Generated: 2026-03-11 22:15</div>
+  </div>
+  
+    <div class="section">
+      <h2>ETL — Column Decisions</h2>
+      <p><strong>Target:</strong> is_fraud</p>
+      <table>
+        <thead><tr><th>Column</th><th>Decision</th></tr></thead>
+        <tbody><tr><td>Unnamed: 0</td><td class='badge-keep'>Keep</td></tr><tr><td>trans_date_trans_time</td><td class='badge-keep'>Keep</td></tr><tr><td>cc_num</td><td class='badge-keep'>Keep</td></tr><tr><td>merchant</td><td class='badge-keep'>Keep</td></tr><tr><td>category</td><td class='badge-keep'>Keep</td></tr><tr><td>amt</td><td class='badge-keep'>Keep</td></tr><tr><td>first</td><td class='badge-keep'>Keep</td></tr><tr><td>last</td><td class='badge-keep'>Keep</td></tr><tr><td>gender</td><td class='badge-keep'>Keep</td></tr><tr><td>street</td><td class='badge-keep'>Keep</td></tr><tr><td>city</td><td class='badge-keep'>Keep</td></tr><tr><td>state</td><td class='badge-keep'>Keep</td></tr><tr><td>zip</td><td class='badge-keep'>Keep</td></tr><tr><td>lat</td><td class='badge-keep'>Keep</td></tr><tr><td>long</td><td class='badge-keep'>Keep</td></tr><tr><td>city_pop</td><td class='badge-keep'>Keep</td></tr><tr><td>job</td><td class='badge-keep'>Keep</td></tr><tr><td>dob</td><td class='badge-keep'>Keep</td></tr><tr><td>trans_num</td><td class='badge-keep'>Keep</td></tr><tr><td>unix_time</td><td class='badge-keep'>Keep</td></tr><tr><td>merch_long</td><td class='badge-keep'>Keep</td></tr><tr><td>merch_lat</td><td class='badge-drop'>Drop</td></tr></tbody>
+      </table>
+    </div>
+  
+    <div class="section">
+      <h2>Selected Features (14)</h2>
+      <table>
+        <tbody><tr><td>amt</td></tr><tr><td>category</td></tr><tr><td>dob</td></tr><tr><td>street</td></tr><tr><td>lat</td></tr><tr><td>zip</td></tr><tr><td>city</td></tr><tr><td>city_pop</td></tr><tr><td>cc_num</td></tr><tr><td>state</td></tr><tr><td>last</td></tr><tr><td>job</td></tr><tr><td>first</td></tr><tr><td>merchant</td></tr></tbody>
+      </table>
+    </div>
+  
+    <div class="section">
+      <h2>Model Fit Statistics</h2>
+      <table>
+        <thead><tr><th>−2 Log Likelihood</th><th class="num">AIC</th><th class="num">BIC</th><th class="num">Cox &amp; Snell R²</th><th class="num">Nagelkerke R²</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="num">560557.519</td>
+            <td class="num">560587.519</td>
+            <td class="num">560752.592</td>
+            <td class="num">-2.3342</td>
+            <td class="num">-42.3825</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <div class="section">
+      <h2>Variables in the Equation</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="num">B</th>
+            <th class="num">S.E.</th>
+            <th class="num">Wald</th>
+            <th class="num">df</th>
+            <th class="num">Sig.</th>
+            <th class="num">Exp(B)</th>
+            <th class="num">95% CI Lower</th>
+            <th class="num">95% CI Upper</th>
+          </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>(Intercept)</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0651</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.8802</td>
+          <td class="num">1.1361</td>
+        </tr>
+        <tr>
+          <td>amt</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr>
+        <tr>
+          <td>category</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0017</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9967</td>
+          <td class="num">1.0033</td>
+        </tr>
+        <tr>
+          <td>dob</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr>
+        <tr>
+          <td>street</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+        </tr>
+        <tr>
+          <td>lat</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0014</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9973</td>
+          <td class="num">1.0027</td>
+        </tr>
+        <tr>
+          <td>zip</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+        </tr>
+        <tr>
+          <td>city</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr>
+        <tr>
+          <td>city_pop</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+        </tr>
+        <tr>
+          <td><strong>cc_num</strong></td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">598.6526</td>
+          <td class="num">1</td>
+          <td class="num sig">< .001 ***</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">1.0000</td>
+        </tr>
+        <tr>
+          <td>state</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0005</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9991</td>
+          <td class="num">1.0009</td>
+        </tr>
+        <tr>
+          <td>last</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr>
+        <tr>
+          <td>job</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr>
+        <tr>
+          <td>first</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0001</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr>
+        <tr>
+          <td>merchant</td>
+          <td class="num">-0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">0.0000</td>
+          <td class="num">1</td>
+          <td class="num sig">1.0000</td>
+          <td class="num">1.0000</td>
+          <td class="num">0.9999</td>
+          <td class="num">1.0001</td>
+        </tr></tbody>
+      </table>
+      <p class="footnote">* p &lt; .05 &nbsp;&nbsp; ** p &lt; .01 &nbsp;&nbsp; *** p &lt; .001</p>
+    </div>
+  
+    <div class="section">
+      <h2>Hosmer and Lemeshow Test</h2>
+      <table>
+        <thead><tr><th class="num">Chi-square</th><th class="num">df</th><th class="num">Sig.</th><th>Interpretation</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="num">393309.6965</td>
+            <td class="num">8</td>
+            <td class="num">< .001</td>
+            <td>Poor fit (p ≤ 0.05)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  
+    <div class="section">
+      <h2>Classification Table</h2>
+      <table>
+        <thead>
+          <tr><th rowspan="2">Observed</th><th colspan="2" class="num">Predicted</th><th class="num">% Correct</th></tr>
+          <tr><th class="num">0</th><th class="num">1</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td class="num">110,960</td><td class="num">0</td><td class="num">100.0%</td></tr>
+          <tr><td>1</td><td class="num">184</td><td class="num">0</td><td class="num">0.0%</td></tr>
+          <tr class="total-row"><td><strong>Overall %</strong></td><td colspan="2"></td><td class="num"><strong>99.8%</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+  
+  
+</div>
+</body>
+</html>

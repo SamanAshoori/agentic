@@ -67,3 +67,26 @@ export async function getOutput(stage) {
 export async function resetSession() {
   return request("/reset", { method: "POST" });
 }
+
+export async function runDescriptives(target) {
+  return request("/run/descriptives", {
+    method: "POST",
+    body: JSON.stringify({ target }),
+  });
+}
+
+export async function runLogistic(payload) {
+  return request("/run/logistic", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function downloadReport() {
+  const a = document.createElement("a");
+  a.href = `${API_BASE}/download/report`;
+  a.download = "ml_pipeline_report.html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}

@@ -34,8 +34,8 @@ class SessionState:
                 return True
             # Allow if dataset already exists on disk
             from pathlib import Path
-            default_path = Path(__file__).resolve().parent.parent / "data" / "fraudTrain.csv"
-            if default_path.exists():
+            default_path = next(iter(sorted((Path(__file__).resolve().parent.parent / "data").glob("*.csv"))), None)
+            if default_path and default_path.exists():
                 self.dataset_path = str(default_path)
                 return True
             return False

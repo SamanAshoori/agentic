@@ -1,3 +1,4 @@
+import json
 import shutil
 from pathlib import Path
 
@@ -25,6 +26,9 @@ from api.pipeline_runner import (
     run_model,
     run_evaluate,
     run_scoring,
+    run_descriptives,
+    run_logistic_regression,
+    generate_html_report,
     DATA,
 )
 
@@ -49,7 +53,7 @@ async def upload_dataset(file: UploadFile):
         raise HTTPException(400, "Only CSV files are accepted")
 
     DATA.mkdir(exist_ok=True)
-    dest = DATA / "fraudTrain.csv"
+    dest = DATA / file.filename
     with open(dest, "wb") as f:
         shutil.copyfileobj(file.file, f)
 
@@ -98,6 +102,7 @@ def confirm_etl(payload: ETLConfirm):
             "columns_kept": result["columns_kept"],
             "columns_dropped": result["columns_dropped"],
             "cleaned_shape": result["cleaned_shape"],
+            "cleaned_path": result["cleaned_path"],
         }
         session.stage_status["etl"] = "confirmed"
         return {"status": "confirmed", "stage": "etl", **result}
@@ -114,11 +119,14 @@ def run_stats_stage():
     if session.stage_status["etl"] not in ("confirmed", "complete"):
         raise HTTPException(400, "ETL stage must be confirmed first")
     target = session.confirmed_outputs.get("etl", {}).get("target")
+    cleaned_path = session.confirmed_outputs.get("etl", {}).get("cleaned_path")
     if not target:
         raise HTTPException(400, "No target variable set")
+    if not cleaned_path:
+        raise HTTPException(400, "Cleaned dataset path not found — re-confirm ETL")
     try:
         session.stage_status["stats"] = "running"
-        result = run_stats(target)
+        result = run_stats(target, cleaned_path)
         session.stage_outputs["stats"] = result
         session.stage_status["stats"] = "awaiting_review"
         session.current_stage = "stats"
@@ -147,12 +155,14 @@ def run_model_stage(payload: ModelConfirm):
         raise HTTPException(400, "Stats stage must be confirmed first")
     target = session.confirmed_outputs["etl"]["target"]
     features = session.confirmed_outputs["stats"]["selected_features"]
+    cleaned_path = session.confirmed_outputs["etl"]["cleaned_path"]
     hp = payload.hyperparameters
     try:
         session.stage_status["model"] = "running"
         result = run_model(
             target=target,
             selected_features=features,
+            cleaned_path=cleaned_path,
             n_estimators=hp.get("n_estimators", 100),
             max_depth=hp.get("max_depth", 10),
             class_weight_mode=hp.get("class_weight", "balanced"),
@@ -186,9 +196,10 @@ def run_evaluate_stage():
         raise HTTPException(400, "Model stage must be confirmed first")
     target = session.confirmed_outputs["etl"]["target"]
     features = session.confirmed_outputs["stats"]["selected_features"]
+    cleaned_path = session.confirmed_outputs["etl"]["cleaned_path"]
     try:
         session.stage_status["evaluate"] = "running"
-        result = run_evaluate(target=target, selected_features=features)
+        result = run_evaluate(target=target, selected_features=features, cleaned_path=cleaned_path)
         session.stage_outputs["evaluate"] = result
         session.stage_status["evaluate"] = "awaiting_review"
         session.current_stage = "evaluate"
@@ -217,9 +228,10 @@ def run_scoring_stage():
         raise HTTPException(400, "Evaluate stage must be confirmed first")
     target = session.confirmed_outputs["etl"]["target"]
     features = session.confirmed_outputs["stats"]["selected_features"]
+    cleaned_path = session.confirmed_outputs["etl"]["cleaned_path"]
     try:
         session.stage_status["scoring"] = "running"
-        result = run_scoring(target=target, selected_features=features)
+        result = run_scoring(target=target, selected_features=features, cleaned_path=cleaned_path)
         session.stage_outputs["scoring"] = result
         session.stage_status["scoring"] = "complete"
         session.current_stage = "complete"
@@ -235,6 +247,74 @@ def download_scored():
     if not path.exists():
         raise HTTPException(404, "Scored output not found")
     return FileResponse(path, media_type="text/csv", filename="scored_output.csv")
+
+
+# ---------------------------------------------------------------------------
+# Descriptives — SPSS-style class comparison
+# ---------------------------------------------------------------------------
+
+@app.post("/run/descriptives")
+def run_descriptives_stage(payload: TargetRequest):
+    if not session.dataset_path:
+        raise HTTPException(400, "No dataset uploaded")
+    try:
+        result = run_descriptives(session.dataset_path, payload.target)
+        return result
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+# ---------------------------------------------------------------------------
+# Logistic Regression
+# ---------------------------------------------------------------------------
+
+@app.post("/run/logistic")
+def run_logistic_stage(payload: ModelConfirm):
+    if session.stage_status["stats"] not in ("confirmed", "complete"):
+        raise HTTPException(400, "Stats stage must be confirmed first")
+    target = session.confirmed_outputs["etl"]["target"]
+    features = session.confirmed_outputs["stats"]["selected_features"]
+    cleaned_path = session.confirmed_outputs["etl"]["cleaned_path"]
+    hp = payload.hyperparameters
+    try:
+        session.stage_status["model"] = "running"
+        result = run_logistic_regression(
+            target=target,
+            selected_features=features,
+            cleaned_path=cleaned_path,
+            test_split=hp.get("test_split", 0.2),
+            max_iter=hp.get("max_iter", 1000),
+        )
+        session.stage_outputs["model"] = result
+        session.stage_status["model"] = "awaiting_review"
+        session.current_stage = "model"
+        return result
+    except Exception as e:
+        session.stage_status["model"] = "pending"
+        raise HTTPException(500, f"Logistic regression failed: {str(e)}")
+
+
+# ---------------------------------------------------------------------------
+# HTML Report
+# ---------------------------------------------------------------------------
+
+@app.get("/download/report")
+def download_report():
+    report_data = {
+        "session": session.to_dict(),
+        "stage_outputs": {k: v for k, v in session.stage_outputs.items()},
+    }
+    for fname in ["model_metrics", "eval_report", "selected_features"]:
+        path = DATA / f"{fname}.json"
+        if path.exists():
+            with open(path) as f:
+                report_data[fname] = json.load(f)
+
+    html = generate_html_report(report_data)
+    report_path = DATA / "pipeline_report.html"
+    with open(report_path, "w") as f:
+        f.write(html)
+    return FileResponse(report_path, media_type="text/html", filename="ml_pipeline_report.html")
 
 
 # ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
   import MetricCard from "../shared/MetricCard.svelte";
   import ConfirmButton from "../shared/ConfirmButton.svelte";
   import SectionCard from "../shared/SectionCard.svelte";
-  import { getColumns, analyzeTarget, confirmStage } from "../../api/client.js";
+  import { getColumns, analyzeTarget, confirmStage, runDescriptives } from "../../api/client.js";
 
   let { status, onconfirmed } = $props();
 
@@ -10,6 +10,7 @@
   let loading = $state(false);
   let targetCol = $state("");
   let statsResults = $state(null);
+  let descriptives = $state(null);
   let analyzingTarget = $state(false);
   let error = $state(null);
 
@@ -47,7 +48,10 @@
     analyzingTarget = true;
     error = null;
     try {
-      statsResults = await analyzeTarget(targetCol);
+      [statsResults, descriptives] = await Promise.all([
+        analyzeTarget(targetCol),
+        runDescriptives(targetCol),
+      ]);
     } catch (e) {
       error = e.message;
     }
@@ -179,6 +183,83 @@
         {/if}
       {/snippet}
     </SectionCard>
+
+    <!-- Descriptives — shown after analyze target -->
+    {#if descriptives}
+      <SectionCard title="Target Distribution & Descriptives">
+        {#snippet children()}
+          <!-- Target class distribution -->
+          <div class="mb-4">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Class Distribution (n = {descriptives.n.toLocaleString()})</p>
+            <div class="flex gap-3">
+              {#each descriptives.target_distribution as cls}
+                <div class="flex-1 bg-gray-50 rounded-lg p-3 text-center border border-gray-200">
+                  <div class="text-xl font-bold text-[var(--navy)]">{cls.count.toLocaleString()}</div>
+                  <div class="text-xs text-gray-500">Class {cls.value}</div>
+                  <div class="text-sm font-medium text-[var(--accent)]">{cls.pct}%</div>
+                </div>
+              {/each}
+            </div>
+          </div>
+
+          <!-- Numeric comparisons by class -->
+          {#if descriptives.numeric_comparisons?.length > 0}
+            <div class="mb-4">
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Numeric Features — Mean (SD) by Class</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="border-b border-gray-200 text-gray-500">
+                      <th class="pb-1.5 pr-3 text-left font-medium">Feature</th>
+                      {#each descriptives.target_distribution as cls}
+                        <th class="pb-1.5 px-2 text-right font-medium">Class {cls.value}</th>
+                      {/each}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each descriptives.numeric_comparisons.slice(0, 10) as col}
+                      <tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <td class="py-1 pr-3 font-medium text-gray-700">{col.column}</td>
+                        {#each col.by_class as cls_stat}
+                          <td class="py-1 px-2 text-right text-gray-600">
+                            {cls_stat.mean.toLocaleString(undefined, {maximumFractionDigits: 3})}
+                            <span class="text-gray-400"> (±{cls_stat.sd.toLocaleString(undefined, {maximumFractionDigits: 3})})</span>
+                          </td>
+                        {/each}
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {/if}
+
+          <!-- Crosstabs (categorical) -->
+          {#if descriptives.crosstabs?.length > 0}
+            <div>
+              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Categorical Features — Cramér's V</p>
+              <div class="space-y-1">
+                {#each descriptives.crosstabs as ct}
+                  <div class="flex items-center gap-3 text-xs">
+                    <span class="w-32 truncate text-gray-700 font-medium">{ct.column}</span>
+                    <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                      <div
+                        class="h-full rounded-full {ct.p_value < 0.05 ? 'bg-[var(--accent)]' : 'bg-gray-300'}"
+                        style="width: {Math.min(100, ct.cramers_v * 100)}%"
+                      ></div>
+                    </div>
+                    <span class="w-12 text-right text-gray-500">V={ct.cramers_v.toFixed(3)}</span>
+                    <span class="w-16 text-right {ct.p_value < 0.05 ? 'text-green-600' : 'text-red-400'}">
+                      p={ct.p_value < 0.001 ? '<.001' : ct.p_value.toFixed(3)}
+                    </span>
+                  </div>
+                {/each}
+              </div>
+            </div>
+          {/if}
+        {/snippet}
+      </SectionCard>
+    {/if}
 
     <!-- Summary counts -->
     {#if targetCol}

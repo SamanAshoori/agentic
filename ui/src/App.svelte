@@ -10,8 +10,10 @@
     uploadDataset,
     runStats,
     runModel,
+    runLogistic,
     runEvaluate,
     resetSession,
+    downloadReport,
   } from "./api/client.js";
 
   const STAGES = ["etl", "stats", "model", "evaluate"];
@@ -59,14 +61,13 @@
     running = false;
   }
 
-  async function handleRunModel(hyperparameters) {
+  async function handleRunModel({ model_type, hyperparameters }) {
     error = null;
     running = true;
     try {
-      const result = await runModel({
-        model_type: "RandomForest",
-        hyperparameters,
-      });
+      const result = model_type === "LogisticRegression"
+        ? await runLogistic({ model_type, hyperparameters })
+        : await runModel({ model_type: "RandomForest", hyperparameters });
       stageData.model = result;
       stageStatus.model = "awaiting_review";
     } catch (e) {
@@ -144,6 +145,12 @@
         class="px-4 py-1.5 text-sm rounded-lg border border-white/30 hover:bg-white/10 transition-colors"
       >
         New Run
+      </button>
+      <button
+        onclick={downloadReport}
+        class="px-4 py-1.5 text-sm rounded-lg border border-white/30 hover:bg-white/10 transition-colors"
+      >
+        Download Report
       </button>
     </div>
   </header>
